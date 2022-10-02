@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-srv
+  # find object with this annotation
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+spec:
+  rules:
+    - host: posts.com
+      http:
+        paths:
+          - path: /posts/create
+            pathType: Prefix
+            # where traffic will be forwarded to
+            backend:
+              service:
+                name: posts-clusterip-srv
+                port:
+                  number: 4000
+          - path: /posts/?(.*)/comments
+            pathType: Prefix
+            # where traffic will be forwarded to
+            backend:
+              service:
+                name: comments-srv
+                port:
+                  number: 4001
+          - path: /posts
+            pathType: Prefix
+            # where traffic will be forwarded to
+            backend:
+              service:
+                name: query-srv
+                port:
+                  number: 4002
+          - path: /?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: client-srv
+                port:
+                  number: 3000

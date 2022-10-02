@@ -1,0 +1,36 @@
+Microservices general idea - lets put every code for one feature into a single compartmentalized thing
+  Each service has its own database and they will never share each others data (database-per-service)
+    Why
+      We want each service to be independant
+        If they are codependant, if one service goes down the other goes down
+      Schema of database might change unexpectedly
+        If one development team decides to randomly change the schema of their database, it will break the other services
+      Services might be better functioning with different types of databases
+    Communication strategies
+      synchronous - services communicate directly with direct requests 
+        pros
+          easy to understand
+          may not need a database
+        cons
+          introduces a dependancy so service d relies on other services
+          if any request fails then all other request fails
+          only as fast as the slowest request
+      asynchronous - services communicate with each other using events (
+        method 1 (bad)
+          handle events by routing them off to different services then the services will return data and the event bus will send the data back
+          This is bad cause it has the same cons as synchronous
+        method 2
+          We have an event bus that will send events to the services that are subscribed to that event
+          Anytime a service does something it will send an event to the event bus saying hey look I did this with some data attached that other services might wanna know
+          pros
+            services have 0 dependancy
+            service will be very fast because it has an immediately available database
+          cons
+            data duplication (the price is worth it cause storage in the modern world is CHEAP)
+            harder to understand
+  90% of the problems with microservices comes with managing data
+
+Steps to update an image in a deployment
+  1. docker build -t <name> .
+  2. docker push <name>
+  3. kubectl reroll restart deployment <name>
